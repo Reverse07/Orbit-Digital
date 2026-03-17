@@ -5,7 +5,6 @@ import { ArrowRight, Sparkles } from 'lucide-react'
 import { useRef, useState, useEffect } from 'react'
 import { SITE } from '@/lib/constants'
 
-// ── Variantes con física real ──
 const containerVariants = {
   hidden: {},
   show: { transition: { staggerChildren: 0.12, delayChildren: 0.3 } },
@@ -15,7 +14,7 @@ const itemVariants = {
   hidden: { opacity: 0, y: 60, filter: 'blur(12px)' },
   show: {
     opacity: 1, y: 0, filter: 'blur(0px)',
-    transition: { duration: 0.9, ease: easeInOut },
+    transition: { duration: 0.9, ease: easeInOut }, // use imported ease function
   },
 }
 
@@ -26,7 +25,7 @@ const clients = [
   { initials: 'AR', color: '#f59e0b' },
 ]
 
-// ── Texto con efecto typewriter ──
+// ── Typewriter ──
 function TypewriterText({ words }: { words: string[] }) {
   const [index, setIndex] = useState(0)
   const [subIndex, setSubIndex] = useState(0)
@@ -50,8 +49,8 @@ function TypewriterText({ words }: { words: string[] }) {
   }, [subIndex, deleting, index, words])
 
   useEffect(() => {
-    const blinkTimer = setInterval(() => setBlink(v => !v), 500)
-    return () => clearInterval(blinkTimer)
+    const t = setInterval(() => setBlink(v => !v), 500)
+    return () => clearInterval(t)
   }, [])
 
   return (
@@ -70,25 +69,16 @@ function OrbitingParticle({ radius, duration, size, color, startAngle }: {
   radius: number; duration: number; size: number; color: string; startAngle: number
 }) {
   const angle = useMotionValue(startAngle)
-
-  useAnimationFrame((t) => {
-    angle.set(startAngle + (t / 1000) * (360 / duration))
-  })
-
+  useAnimationFrame((t) => { angle.set(startAngle + (t / 1000) * (360 / duration)) })
   const x = useTransform(angle, (a) => Math.cos((a * Math.PI) / 180) * radius)
   const y = useTransform(angle, (a) => Math.sin((a * Math.PI) / 180) * radius)
-
   return (
-    <motion.div
-      style={{
-        position: 'absolute', x, y,
-        width: size, height: size, borderRadius: '50%',
-        background: color,
-        boxShadow: `0 0 ${size * 3}px ${color}`,
-        top: '50%', left: '50%',
-        marginTop: -size / 2, marginLeft: -size / 2,
-      }}
-    />
+    <motion.div style={{
+      position: 'absolute', x, y,
+      width: size, height: size, borderRadius: '50%',
+      background: color, boxShadow: `0 0 ${size * 3}px ${color}`,
+      top: '50%', left: '50%', marginTop: -size / 2, marginLeft: -size / 2,
+    }} />
   )
 }
 
@@ -98,9 +88,7 @@ function AnimatedCounter({ value, suffix = '', id }: { value: number; suffix?: s
   const [started, setStarted] = useState(false)
 
   useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) setStarted(true)
-    })
+    const observer = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) setStarted(true) })
     const el = document.getElementById(id)
     if (el) observer.observe(el)
     return () => observer.disconnect()
@@ -108,14 +96,12 @@ function AnimatedCounter({ value, suffix = '', id }: { value: number; suffix?: s
 
   useEffect(() => {
     if (!started) return
-    const duration = 1800
+    const dur = 1800
     const start = Date.now()
     const timer = setInterval(() => {
-      const elapsed = Date.now() - start
-      const progress = Math.min(elapsed / duration, 1)
-      const eased = 1 - Math.pow(1 - progress, 3)
-      setCount(Math.floor(eased * value))
-      if (progress === 1) clearInterval(timer)
+      const p = Math.min((Date.now() - start) / dur, 1)
+      setCount(Math.floor((1 - Math.pow(1 - p, 3)) * value))
+      if (p === 1) clearInterval(timer)
     }, 16)
     return () => clearInterval(timer)
   }, [started, value])
@@ -128,6 +114,7 @@ export default function Hero() {
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
   const [isReady, setIsReady] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
   const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '30%'])
@@ -141,12 +128,18 @@ export default function Hero() {
 
   useEffect(() => {
     setIsReady(true)
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
     const handleMouse = (e: MouseEvent) => {
       mouseX.set(e.clientX - window.innerWidth / 2)
       mouseY.set(e.clientY - window.innerHeight / 2)
     }
     window.addEventListener('mousemove', handleMouse)
-    return () => window.removeEventListener('mousemove', handleMouse)
+    return () => {
+      window.removeEventListener('mousemove', handleMouse)
+      window.removeEventListener('resize', checkMobile)
+    }
   }, [mouseX, mouseY])
 
   return (
@@ -156,14 +149,15 @@ export default function Hero() {
       textAlign: 'center', overflow: 'hidden', background: '#060810',
     }}>
 
-      {/* ── Fondo con parallax y glows animados ── */}
+      {/* ── Glows animados ── */}
       <motion.div style={{ y: bgY, position: 'absolute', inset: 0, pointerEvents: 'none' }}>
         <motion.div
           animate={{ scale: [1, 1.05, 1], rotate: [0, 5, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
           style={{
             position: 'absolute', top: '-20%', left: '30%',
-            width: '900px', height: '900px', borderRadius: '50%',
+            width: isMobile ? '400px' : '900px', height: isMobile ? '400px' : '900px',
+            borderRadius: '50%',
             background: 'radial-gradient(ellipse, rgba(79,124,255,0.22) 0%, transparent 65%)',
             filter: 'blur(60px)',
           }}
@@ -173,7 +167,8 @@ export default function Hero() {
           transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
           style={{
             position: 'absolute', top: '0%', left: '-10%',
-            width: '700px', height: '700px', borderRadius: '50%',
+            width: isMobile ? '300px' : '700px', height: isMobile ? '300px' : '700px',
+            borderRadius: '50%',
             background: 'radial-gradient(ellipse, rgba(124,58,237,0.18) 0%, transparent 65%)',
             filter: 'blur(80px)',
           }}
@@ -183,7 +178,8 @@ export default function Hero() {
           transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut', delay: 6 }}
           style={{
             position: 'absolute', bottom: '10%', right: '-5%',
-            width: '500px', height: '500px', borderRadius: '50%',
+            width: isMobile ? '250px' : '500px', height: isMobile ? '250px' : '500px',
+            borderRadius: '50%',
             background: 'radial-gradient(ellipse, rgba(6,214,160,0.14) 0%, transparent 65%)',
             filter: 'blur(60px)',
           }}
@@ -202,8 +198,8 @@ export default function Hero() {
         maskImage: 'radial-gradient(ellipse 90% 90% at 50% 50%, black 0%, transparent 100%)',
       }} />
 
-      {/* ── Órbitas de partículas ── */}
-      {isReady && (
+      {/* ── Órbitas (solo desktop) ── */}
+      {isReady && !isMobile && (
         <div style={{
           position: 'absolute', top: '50%', left: '50%',
           marginTop: -400, marginLeft: -400,
@@ -229,76 +225,92 @@ export default function Hero() {
         </div>
       )}
 
-      {/* ── Contenido con perspectiva 3D al mouse ── */}
-      <motion.div style={{ y: contentY, opacity, perspective: 1200 }}>
-        <motion.div style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}>
+      {/* ── Contenido con perspectiva 3D (solo desktop) ── */}
+      <motion.div style={{ y: contentY, opacity, perspective: isMobile ? 'none' : 1200 }}>
+        <motion.div style={isMobile ? {} : { rotateX, rotateY, transformStyle: 'preserve-3d' }}>
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="show"
             style={{
               position: 'relative', zIndex: 10, width: '100%',
-              maxWidth: '1000px', margin: '0 auto', padding: '140px 24px 120px',
+              maxWidth: '1000px', margin: '0 auto',
+              padding: isMobile ? '120px 20px 140px' : '140px 24px 120px',
             }}
           >
 
-            {/* Badge con shimmer */}
-            <motion.div variants={itemVariants} style={{ marginBottom: '40px' }}>
+            {/* Badge */}
+            <motion.div variants={itemVariants} style={{ marginBottom: isMobile ? '28px' : '40px' }}>
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '10px',
-                  padding: '8px 20px', borderRadius: '100px',
+                  display: 'inline-flex', alignItems: 'center', gap: '8px',
+                  padding: isMobile ? '7px 14px' : '8px 20px', borderRadius: '100px',
                   background: 'linear-gradient(135deg, rgba(79,124,255,0.12), rgba(124,58,237,0.12))',
                   border: '1px solid rgba(79,124,255,0.3)',
-                  color: '#a5b8ff', fontSize: '11px', fontWeight: 700,
-                  letterSpacing: '0.12em', textTransform: 'uppercase',
+                  color: '#a5b8ff', fontSize: isMobile ? '10px' : '11px', fontWeight: 700,
+                  letterSpacing: '0.1em', textTransform: 'uppercase',
                   cursor: 'default', position: 'relative', overflow: 'hidden',
                 }}>
                 <motion.div
                   animate={{ x: ['-100%', '200%'] }}
                   transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 3, ease: 'easeInOut' }}
                   style={{
-                    position: 'absolute', top: 0, left: 0,
-                    width: '40%', height: '100%',
+                    position: 'absolute', top: 0, left: 0, width: '40%', height: '100%',
                     background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent)',
                     transform: 'skewX(-20deg)',
                   }}
                 />
-                <Sparkles size={12} color="#4f7cff" />
-                Agencia Digital de Alto Rendimiento
+                <Sparkles size={isMobile ? 10 : 12} color="#4f7cff" />
+                {isMobile ? 'Agencia Digital' : 'Agencia Digital de Alto Rendimiento'}
                 <motion.span
                   animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
-                  style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#06d6a0', display: 'inline-block' }}
+                  style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#06d6a0', display: 'inline-block', flexShrink: 0 }}
                 />
               </motion.div>
             </motion.div>
 
-            {/* Headline con typewriter */}
+            {/* Headline */}
             <motion.div variants={itemVariants}>
               <h1 style={{
                 fontFamily: 'Syne, sans-serif', fontWeight: 800,
-                fontSize: 'clamp(2.8rem, 6.5vw, 5.4rem)',
-                lineHeight: 1.04, letterSpacing: '-0.035em',
-                color: '#fff', marginBottom: '28px',
+                fontSize: isMobile ? 'clamp(2.2rem, 10vw, 3rem)' : 'clamp(2.8rem, 6.5vw, 5.4rem)',
+                lineHeight: 1.06, letterSpacing: '-0.03em',
+                color: '#fff', marginBottom: '24px',
               }}>
-                Soluciones digitales que{' '}
-                <br />
-                <TypewriterText words={[
-                  'impulsan tu negocio',
-                  'convierten clientes',
-                  'automatizan procesos',
-                  'generan resultados',
-                ]} />
+                {isMobile ? (
+                  <>
+                    Soluciones que{' '}
+                    <TypewriterText words={[
+                      'impulsan negocios',
+                      'convierten clientes',
+                      'automatizan tareas',
+                      'generan resultados',
+                    ]} />
+                  </>
+                ) : (
+                  <>
+                    Soluciones digitales que{' '}
+                    <br />
+                    <TypewriterText words={[
+                      'impulsan tu negocio',
+                      'convierten clientes',
+                      'automatizan procesos',
+                      'generan resultados',
+                    ]} />
+                  </>
+                )}
               </h1>
             </motion.div>
 
             {/* Subheadline */}
             <motion.div variants={itemVariants}>
               <p style={{
-                color: '#8a97b0', fontSize: 'clamp(1rem, 1.8vw, 1.15rem)',
-                lineHeight: 1.8, maxWidth: '600px', margin: '0 auto 48px',
+                color: '#8a97b0',
+                fontSize: isMobile ? '0.95rem' : 'clamp(1rem, 1.8vw, 1.15rem)',
+                lineHeight: 1.75, maxWidth: '600px', margin: '0 auto 40px',
+                padding: isMobile ? '0 4px' : '0',
               }}>
                 Diseñamos y desarrollamos sitios web, sistemas y automatizaciones
                 que convierten visitantes en clientes y procesos lentos en{' '}
@@ -308,15 +320,21 @@ export default function Hero() {
 
             {/* CTAs */}
             <motion.div variants={itemVariants}
-              style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '14px', marginBottom: '64px' }}>
+              style={{
+                display: 'flex',
+                flexDirection: isMobile ? 'column' : 'row',
+                flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center',
+                gap: '12px', marginBottom: isMobile ? '48px' : '64px',
+              }}>
 
               <motion.a
                 href="#portafolio"
                 whileHover={{ y: -4, scale: 1.03 }}
                 whileTap={{ scale: 0.96 }}
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '10px',
-                  padding: '15px 30px', borderRadius: '14px',
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+                  padding: isMobile ? '14px 28px' : '15px 30px',
+                  borderRadius: '14px', width: isMobile ? '100%' : 'auto',
                   background: 'linear-gradient(135deg, #4f7cff 0%, #7c3aed 100%)',
                   boxShadow: '0 0 40px rgba(79,124,255,0.5), inset 0 1px 0 rgba(255,255,255,0.2)',
                   color: '#fff', fontSize: '15px', fontWeight: 600,
@@ -334,10 +352,7 @@ export default function Hero() {
                   }}
                 />
                 Ver proyectos
-                <motion.div
-                  animate={{ x: [0, 4, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-                >
+                <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}>
                   <ArrowRight size={16} />
                 </motion.div>
               </motion.a>
@@ -347,8 +362,9 @@ export default function Hero() {
                 whileHover={{ y: -4, scale: 1.03 }}
                 whileTap={{ scale: 0.96 }}
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '10px',
-                  padding: '15px 30px', borderRadius: '14px',
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+                  padding: isMobile ? '14px 28px' : '15px 30px',
+                  borderRadius: '14px', width: isMobile ? '100%' : 'auto',
                   background: 'rgba(255,255,255,0.03)',
                   border: '1px solid rgba(255,255,255,0.1)',
                   color: '#c8d0e0', fontSize: '15px', fontWeight: 600,
@@ -360,43 +376,43 @@ export default function Hero() {
 
             {/* Social proof */}
             <motion.div variants={itemVariants}
-              style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '24px' }}>
+              style={{
+                display: 'flex', flexWrap: 'wrap', alignItems: 'center',
+                justifyContent: 'center',
+                gap: isMobile ? '16px' : '24px',
+              }}>
 
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 {clients.map((c, i) => (
-                  <motion.div
-                    key={i}
-                    whileHover={{ y: -4 }}
-                    style={{
-                      width: '40px', height: '40px', borderRadius: '50%',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '11px', fontWeight: 700, color: '#fff',
-                      background: `linear-gradient(135deg, ${c.color}, ${c.color}88)`,
-                      border: '2.5px solid #060810',
-                      marginLeft: i === 0 ? 0 : '-11px',
-                      zIndex: clients.length - i, position: 'relative',
-                      boxShadow: `0 0 12px ${c.color}40`,
-                    }}>
+                  <motion.div key={i} whileHover={{ y: -4 }} style={{
+                    width: isMobile ? '34px' : '40px', height: isMobile ? '34px' : '40px',
+                    borderRadius: '50%',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '10px', fontWeight: 700, color: '#fff',
+                    background: `linear-gradient(135deg, ${c.color}, ${c.color}88)`,
+                    border: '2.5px solid #060810',
+                    marginLeft: i === 0 ? 0 : '-10px',
+                    zIndex: clients.length - i, position: 'relative',
+                    boxShadow: `0 0 12px ${c.color}40`,
+                  }}>
                     {c.initials}
                   </motion.div>
                 ))}
               </div>
 
-              <div style={{ width: '1px', height: '36px', background: 'rgba(255,255,255,0.08)' }} />
+              {!isMobile && <div style={{ width: '1px', height: '36px', background: 'rgba(255,255,255,0.08)' }} />}
 
               <div>
                 <motion.div
-                  style={{ display: 'flex', gap: '3px', marginBottom: '5px', justifyContent: 'center' }}
-                  initial="hidden"
-                  animate="show"
+                  style={{ display: 'flex', gap: '3px', marginBottom: '4px', justifyContent: 'center' }}
+                  initial="hidden" animate="show"
                   variants={{ show: { transition: { staggerChildren: 0.08, delayChildren: 1.2 } } }}
                 >
                   {[...Array(5)].map((_, i) => (
-                    <motion.span
-                      key={i}
+                    <motion.span key={i}
                       variants={{ hidden: { opacity: 0, scale: 0 }, show: { opacity: 1, scale: 1 } }}
                       transition={{ type: 'spring', stiffness: 300 }}
-                      style={{ color: '#f59e0b', fontSize: '15px' }}
+                      style={{ color: '#f59e0b', fontSize: '14px' }}
                     >★</motion.span>
                   ))}
                 </motion.div>
@@ -405,15 +421,17 @@ export default function Hero() {
                 </p>
               </div>
 
-              <div style={{ width: '1px', height: '36px', background: 'rgba(255,255,255,0.08)' }} />
+              {!isMobile && <div style={{ width: '1px', height: '36px', background: 'rgba(255,255,255,0.08)' }} />}
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <motion.span
                   animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
-                  style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#06d6a0', display: 'inline-block' }}
+                  style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#06d6a0', display: 'inline-block', flexShrink: 0 }}
                 />
-                <span style={{ color: '#8a97b0', fontSize: '12px' }}>Disponibles para nuevos proyectos</span>
+                <span style={{ color: '#8a97b0', fontSize: '12px' }}>
+                  {isMobile ? 'Disponibles ahora' : 'Disponibles para nuevos proyectos'}
+                </span>
               </div>
             </motion.div>
 
@@ -421,18 +439,22 @@ export default function Hero() {
         </motion.div>
       </motion.div>
 
-      {/* ── Stats bar con contadores animados ── */}
+      {/* ── Stats bar ── */}
       <motion.div
         initial={{ opacity: 0, y: 40, filter: 'blur(10px)' }}
         animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
         transition={{ delay: 1.8, duration: 1, ease: [0.16, 1, 0.3, 1] }}
         style={{
-          position: 'absolute', bottom: '32px', left: '50%', transform: 'translateX(-50%)',
+          position: 'absolute',
+          bottom: isMobile ? '16px' : '32px',
+          left: '50%', transform: 'translateX(-50%)',
           display: 'flex', alignItems: 'center',
           background: 'rgba(10,13,25,0.9)', backdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255,255,255,0.07)', borderRadius: '20px',
-          padding: '18px 36px', whiteSpace: 'nowrap',
+          border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px',
+          padding: isMobile ? '12px 20px' : '18px 36px',
+          whiteSpace: 'nowrap',
           boxShadow: '0 12px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
+          gap: isMobile ? '0' : '0',
         }}>
         {[
           { value: 50, suffix: '+', label: 'Proyectos', id: 'stat-1' },
@@ -440,47 +462,53 @@ export default function Hero() {
           { value: 3, suffix: 'x', label: 'Conversiones', id: 'stat-3' },
           { value: 24, suffix: 'h', label: 'Respuesta', id: 'stat-4' },
         ].map((stat, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '36px' }}>
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '16px' : '36px' }}>
             <motion.div whileHover={{ y: -2 }} style={{ textAlign: 'center', cursor: 'default' }}>
               <div style={{
                 fontFamily: 'Syne, sans-serif', fontWeight: 800,
-                fontSize: '22px', lineHeight: 1.2,
+                fontSize: isMobile ? '16px' : '22px', lineHeight: 1.2,
                 background: 'linear-gradient(135deg, #fff 0%, #a5b8ff 100%)',
                 WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
               }}>
                 <AnimatedCounter value={stat.value} suffix={stat.suffix} id={stat.id} />
               </div>
-              <div style={{ color: '#4a5568', fontSize: '11px', marginTop: '3px', fontWeight: 500, letterSpacing: '0.05em' }}>
+              <div style={{ color: '#4a5568', fontSize: isMobile ? '9px' : '11px', marginTop: '2px', fontWeight: 500, letterSpacing: '0.05em' }}>
                 {stat.label}
               </div>
             </motion.div>
-            {i < 3 && <div style={{ width: '1px', height: '36px', background: 'rgba(255,255,255,0.05)' }} />}
+            {i < 3 && <div style={{ width: '1px', height: isMobile ? '28px' : '36px', background: 'rgba(255,255,255,0.05)' }} />}
           </div>
         ))}
       </motion.div>
 
-      {/* ── Scroll indicator ── */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 3, duration: 1 }}
-        style={{
-          position: 'absolute', bottom: '110px', left: '50%', transform: 'translateX(-50%)',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
-          pointerEvents: 'none',
-        }}>
-        <span style={{ color: '#2d3748', fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 600 }}>
-          scroll
-        </span>
+      {/* ── Scroll indicator (solo desktop) ── */}
+      {!isMobile && (
         <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 3, duration: 1 }}
           style={{
-            width: '1px', height: '32px',
-            background: 'linear-gradient(to bottom, rgba(79,124,255,0.6), transparent)',
-          }}
-        />
-      </motion.div>
+            position: 'absolute', bottom: '110px', left: '50%', transform: 'translateX(-50%)',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
+            pointerEvents: 'none',
+          }}>
+          <span style={{ color: '#2d3748', fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 600 }}>
+            scroll
+          </span>
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ width: '1px', height: '32px', background: 'linear-gradient(to bottom, rgba(79,124,255,0.6), transparent)' }}
+          />
+        </motion.div>
+      )}
+
+      {/* ── CSS responsive ── */}
+      <style>{`
+        @media (max-width: 480px) {
+          #inicio { min-height: 100svh; }
+        }
+      `}</style>
 
     </section>
   )
