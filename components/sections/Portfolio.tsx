@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowUpRight, Globe, Monitor, Database, Users } from 'lucide-react'
+import Image from 'next/image'
 
 const projects = [
   {
@@ -13,6 +14,7 @@ const projects = [
     url: 'https://reverse07.github.io/modular-web-base/index.html',
     color: '#f59e0b',
     icon: Globe,
+    image: '/img/paginaLudier.png',
     tags: ['HTML', 'CSS', 'JavaScript', 'Responsive'],
     highlights: [
       'Galería de obras reales con fotos de proyectos',
@@ -31,6 +33,7 @@ const projects = [
     url: 'https://huracan-lc.vercel.app/',
     color: '#4f7cff',
     icon: Globe,
+    image: '/img/paginaHuracan.png',
     tags: ['Next.js', 'Vercel', 'Responsive', 'Dashboard'],
     highlights: [
       'Tabla de posiciones actualizada en tiempo real',
@@ -49,6 +52,7 @@ const projects = [
     url: null,
     color: '#06d6a0',
     icon: Monitor,
+    image: null,
     tags: ['React', 'Spring Boot', 'Supabase', 'Roles'],
     highlights: [
       'Panel de administrador con reportes completos',
@@ -67,6 +71,7 @@ const projects = [
     url: null,
     color: '#7c3aed',
     icon: Database,
+    image: null,
     tags: ['Java', 'MySQL', 'JavaFX', 'Desktop'],
     highlights: [
       'Gestión de productos e inventario',
@@ -85,6 +90,7 @@ const projects = [
     url: null,
     color: '#ec4899',
     icon: Users,
+    image: null,
     tags: ['Java', 'PostgreSQL', 'JDBC', 'Desktop'],
     highlights: [
       'Catálogo digital de libros y recursos',
@@ -213,57 +219,76 @@ export default function Portfolio() {
                     height: 180, position: 'relative', overflow: 'hidden',
                     background: `linear-gradient(135deg, ${project.color}18, ${project.color}06)`,
                   }}>
-                    {/* Patrón decorativo */}
-                    <div style={{
-                      position: 'absolute', inset: 0,
-                      backgroundImage: `radial-gradient(${project.color}20 1px, transparent 1px)`,
-                      backgroundSize: '24px 24px',
-                    }} />
-
-                    {/* Formas geométricas */}
-                    <div style={{
-                      position: 'absolute', bottom: -20, right: -20,
-                      width: 140, height: 140, borderRadius: '50%',
-                      background: `radial-gradient(circle, ${project.color}18, transparent 70%)`,
-                    }} />
-                    <div style={{
-                      position: 'absolute', top: -10, left: -10,
-                      width: 80, height: 80, borderRadius: '50%',
-                      background: `radial-gradient(circle, ${project.color}12, transparent 70%)`,
-                    }} />
-
-                    {/* Icono central */}
-                    <div style={{
-                      position: 'absolute', top: '50%', left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      width: 64, height: 64, borderRadius: 18,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: `${project.color}20`,
-                      border: `1px solid ${project.color}35`,
-                      boxShadow: `0 0 24px ${project.color}20`,
-                    }}>
-                      <Icon size={28} color={project.color} />
-                    </div>
+                    {/* Imagen real si existe */}
+                    {project.image ? (
+                      <>
+                        <Image
+                          src={project.image}
+                          alt={project.title}
+                          fill
+                          style={{ objectFit: 'cover', objectPosition: 'top', transition: 'transform 0.4s ease' }}
+                          sizes="(max-width: 640px) 100vw, 340px"
+                        />
+                        {/* Overlay degradado para legibilidad de badges */}
+                        <div style={{
+                          position: 'absolute', inset: 0,
+                          background: `linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, transparent 50%, rgba(0,0,0,0.3) 100%)`,
+                        }} />
+                      </>
+                    ) : (
+                      <>
+                        {/* Patrón decorativo (solo para proyectos sin imagen) */}
+                        <div style={{
+                          position: 'absolute', inset: 0,
+                          backgroundImage: `radial-gradient(${project.color}20 1px, transparent 1px)`,
+                          backgroundSize: '24px 24px',
+                        }} />
+                        <div style={{
+                          position: 'absolute', bottom: -20, right: -20,
+                          width: 140, height: 140, borderRadius: '50%',
+                          background: `radial-gradient(circle, ${project.color}18, transparent 70%)`,
+                        }} />
+                        <div style={{
+                          position: 'absolute', top: -10, left: -10,
+                          width: 80, height: 80, borderRadius: '50%',
+                          background: `radial-gradient(circle, ${project.color}12, transparent 70%)`,
+                        }} />
+                        {/* Icono central (solo sin imagen) */}
+                        <div style={{
+                          position: 'absolute', top: '50%', left: '50%',
+                          transform: 'translate(-50%, -50%)',
+                          width: 64, height: 64, borderRadius: 18,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          background: `${project.color}20`,
+                          border: `1px solid ${project.color}35`,
+                          boxShadow: `0 0 24px ${project.color}20`,
+                        }}>
+                          <Icon size={28} color={project.color} />
+                        </div>
+                      </>
+                    )}
 
                     {/* Badge categoría */}
-                    <div style={{ position: 'absolute', top: 14, left: 14 }}>
+                    <div style={{ position: 'absolute', top: 14, left: 14, zIndex: 2 }}>
                       <span style={{
                         fontSize: 11, fontWeight: 600, padding: '4px 10px',
                         borderRadius: 100,
                         background: `${project.color}20`, color: project.color,
                         border: `1px solid ${project.color}35`,
+                        backdropFilter: 'blur(8px)',
                       }}>
                         {project.category}
                       </span>
                     </div>
 
                     {/* Status */}
-                    <div style={{ position: 'absolute', top: 14, right: 14 }}>
+                    <div style={{ position: 'absolute', top: 14, right: 14, zIndex: 2 }}>
                       <span style={{
                         fontSize: 10, fontWeight: 600, padding: '4px 10px',
                         borderRadius: 100, display: 'flex', alignItems: 'center', gap: 5,
                         background: 'rgba(6,214,160,0.12)',
                         color: '#06d6a0', border: '1px solid rgba(6,214,160,0.25)',
+                        backdropFilter: 'blur(8px)',
                       }}>
                         <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#06d6a0', display: 'inline-block' }} />
                         {project.status}
@@ -278,7 +303,7 @@ export default function Portfolio() {
                         animate={{ opacity: isHovered ? 1 : 0, scale: isHovered ? 1 : 0.8 }}
                         transition={{ duration: 0.2 }}
                         style={{
-                          position: 'absolute', bottom: 14, right: 14,
+                          position: 'absolute', bottom: 14, right: 14, zIndex: 2,
                           width: 36, height: 36, borderRadius: 10,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           background: project.color,
