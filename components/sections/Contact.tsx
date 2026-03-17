@@ -2,11 +2,12 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, MessageCircle, Mail, Clock, CheckCircle2, ArrowRight, Phone } from 'lucide-react'
+import { Send, Mail, Clock, CheckCircle2, ArrowRight, Phone } from 'lucide-react'
+import Image from 'next/image'
 
 const WHATSAPP = '51965391256'
 const EMAIL = 'tmldiego0@hotmail.com'
-const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xgonorvv' // 👈 Tu endpoint de Formspree
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xgonorvv'
 
 const services = [
   { value: 'web', label: 'Página Web Profesional' },
@@ -19,7 +20,7 @@ const services = [
 const guarantees = [
   { icon: CheckCircle2, text: 'Primera consulta completamente gratis' },
   { icon: Clock, text: 'Respondemos en menos de 24 horas' },
-  { icon: MessageCircle, text: 'Sin presiones ni compromisos' },
+  { icon: null, text: 'Sin presiones ni compromisos', isWhatsapp: true },
 ]
 
 export default function Contact() {
@@ -43,28 +44,25 @@ export default function Contact() {
     try {
       const response = await fetch(FORMSPREE_ENDPOINT, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
           service: services.find(s => s.value === formData.service)?.label || formData.service,
           message: formData.message,
-          _subject: `Nuevo mensaje de ${formData.name} - Orbit Digital`, // Asunto del email
+          _subject: `Nuevo mensaje de ${formData.name} - Orbit Digital`,
         }),
       })
 
       if (response.ok) {
         setSent(true)
-        // Opcional: Limpiar el formulario
         setFormData({ name: '', email: '', phone: '', service: '', message: '' })
       } else {
         const data = await response.json()
         setError(data.error || 'Hubo un error al enviar el mensaje. Por favor intentá de nuevo.')
       }
-    } catch (err) {
+    } catch {
       setError('Error de conexión. Por favor intentá de nuevo o escribinos por WhatsApp.')
     } finally {
       setLoading(false)
@@ -161,8 +159,15 @@ export default function Contact() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 background: 'rgba(6,214,160,0.15)', border: '1px solid rgba(6,214,160,0.3)',
                 boxShadow: '0 0 16px rgba(6,214,160,0.15)',
+                overflow: 'hidden', position: 'relative',
               }}>
-                <MessageCircle size={22} color="#06d6a0" />
+                <Image
+                  src="/img/whatsappLogo.jpg"
+                  alt="WhatsApp"
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  sizes="50px"
+                />
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{
@@ -250,7 +255,13 @@ export default function Contact() {
             }}>
               {guarantees.map((g, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <g.icon size={14} color="#4f7cff" style={{ flexShrink: 0 }} />
+                  {g.isWhatsapp ? (
+                    <div style={{ width: 14, height: 14, borderRadius: 3, overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
+                      <Image src="/img/whatsappLogo.jpg" alt="WhatsApp" fill style={{ objectFit: 'cover' }} sizes="14px" />
+                    </div>
+                  ) : (
+                    g.icon && <g.icon size={14} color="#4f7cff" style={{ flexShrink: 0 }} />
+                  )}
                   <span style={{ color: '#c8d0e0', fontSize: 13 }}>{g.text}</span>
                 </div>
               ))}
@@ -264,7 +275,6 @@ export default function Contact() {
           >
             <AnimatePresence mode="wait">
               {sent ? (
-                /* Estado enviado */
                 <motion.div
                   key="success"
                   initial={{ opacity: 0, scale: 0.95 }}
@@ -309,7 +319,6 @@ export default function Contact() {
                 </motion.div>
 
               ) : (
-                /* Formulario */
                 <motion.div
                   key="form"
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }}
@@ -342,7 +351,6 @@ export default function Contact() {
 
                   <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 
-                    {/* Nombre + Email */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }} className="form-row">
                       <div>
                         <label style={labelStyle}>Tu nombre</label>
@@ -368,7 +376,6 @@ export default function Contact() {
                       </div>
                     </div>
 
-                    {/* Teléfono + Servicio */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }} className="form-row">
                       <div>
                         <label style={labelStyle}>Tu teléfono (opcional)</label>
@@ -402,7 +409,6 @@ export default function Contact() {
                       </div>
                     </div>
 
-                    {/* Mensaje */}
                     <div>
                       <label style={labelStyle}>Contanos sobre tu proyecto</label>
                       <textarea
@@ -415,9 +421,7 @@ export default function Contact() {
                       />
                     </div>
 
-                    {/* Botones */}
                     <div style={{ display: 'flex', gap: 12, marginTop: 4 }} className="form-buttons">
-                      {/* Submit */}
                       <motion.button
                         type="submit"
                         disabled={loading}
@@ -435,11 +439,10 @@ export default function Contact() {
                           opacity: loading ? 0.7 : 1,
                         }}
                       >
-                        {loading ? 'Enviando...' : 'Enviar mensaje'} 
+                        {loading ? 'Enviando...' : 'Enviar mensaje'}
                         {!loading && <Send size={15} />}
                       </motion.button>
 
-                      {/* WhatsApp alternativo */}
                       <motion.a
                         href={`https://wa.me/${WHATSAPP}?text=${whatsappMessage}`}
                         target="_blank" rel="noopener noreferrer"
@@ -453,7 +456,9 @@ export default function Contact() {
                           whiteSpace: 'nowrap',
                         }}
                       >
-                        <MessageCircle size={15} />
+                        <div style={{ width: 18, height: 18, borderRadius: 4, overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
+                          <Image src="/img/whatsappLogo.jpg" alt="WhatsApp" fill style={{ objectFit: 'cover' }} sizes="18px" />
+                        </div>
                         WhatsApp
                       </motion.a>
                     </div>
