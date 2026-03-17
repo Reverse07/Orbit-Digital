@@ -52,7 +52,7 @@ const projects = [
     url: null,
     color: '#06d6a0',
     icon: Monitor,
-    image: null,
+    image: '/img/clinicaProyecto.png',
     tags: ['React', 'Spring Boot', 'Supabase', 'Roles'],
     highlights: [
       'Panel de administrador con reportes completos',
@@ -71,7 +71,7 @@ const projects = [
     url: null,
     color: '#7c3aed',
     icon: Database,
-    image: null,
+    image: '/img/sistemaVentasProyecto.png',
     tags: ['Java', 'MySQL', 'JavaFX', 'Desktop'],
     highlights: [
       'Gestión de productos e inventario',
@@ -90,7 +90,7 @@ const projects = [
     url: null,
     color: '#ec4899',
     icon: Users,
-    image: null,
+    image: '/img/reporteVistaBiblioteca.png',
     tags: ['Java', 'PostgreSQL', 'JDBC', 'Desktop'],
     highlights: [
       'Catálogo digital de libros y recursos',
