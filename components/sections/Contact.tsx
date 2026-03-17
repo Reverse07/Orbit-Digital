@@ -3,11 +3,16 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Send, Mail, Clock, CheckCircle2, ArrowRight, Phone } from 'lucide-react'
-import Image from 'next/image'
 
 const WHATSAPP = '51965391256'
 const EMAIL = 'tmldiego0@hotmail.com'
 const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xgonorvv'
+
+const WhatsAppIcon = ({ size = 20, color = '#06d6a0' }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={color} xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+)
 
 const services = [
   { value: 'web', label: 'Página Web Profesional' },
@@ -18,8 +23,8 @@ const services = [
 ]
 
 const guarantees = [
-  { icon: CheckCircle2, text: 'Primera consulta completamente gratis' },
-  { icon: Clock, text: 'Respondemos en menos de 24 horas' },
+  { icon: CheckCircle2, text: 'Primera consulta completamente gratis', isWhatsapp: false },
+  { icon: Clock, text: 'Respondemos en menos de 24 horas', isWhatsapp: false },
   { icon: null, text: 'Sin presiones ni compromisos', isWhatsapp: true },
 ]
 
@@ -40,7 +45,6 @@ export default function Contact() {
     e.preventDefault()
     setLoading(true)
     setError('')
-
     try {
       const response = await fetch(FORMSPREE_ENDPOINT, {
         method: 'POST',
@@ -54,7 +58,6 @@ export default function Contact() {
           _subject: `Nuevo mensaje de ${formData.name} - Orbit Digital`,
         }),
       })
-
       if (response.ok) {
         setSent(true)
         setFormData({ name: '', email: '', phone: '', service: '', message: '' })
@@ -159,21 +162,11 @@ export default function Contact() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 background: 'rgba(6,214,160,0.15)', border: '1px solid rgba(6,214,160,0.3)',
                 boxShadow: '0 0 16px rgba(6,214,160,0.15)',
-                overflow: 'hidden', position: 'relative',
               }}>
-                <Image
-                  src="/img/whatsappLogo.jpg"
-                  alt="WhatsApp"
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  sizes="50px"
-                />
+                <WhatsAppIcon size={26} color="#06d6a0" />
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{
-                  fontFamily: 'Syne, sans-serif', fontWeight: 700,
-                  fontSize: 15, color: '#fff', marginBottom: 4,
-                }}>
+                <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 15, color: '#fff', marginBottom: 4 }}>
                   Escribinos por WhatsApp
                 </div>
                 <div style={{ color: '#8a97b0', fontSize: 12 }}>
@@ -197,9 +190,7 @@ export default function Contact() {
                 <Mail size={20} color="#4f7cff" />
               </div>
               <div>
-                <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 600, fontSize: 14, color: '#fff', marginBottom: 3 }}>
-                  Email
-                </div>
+                <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 600, fontSize: 14, color: '#fff', marginBottom: 3 }}>Email</div>
                 <div style={{ color: '#8a97b0', fontSize: 12 }}>{EMAIL}</div>
               </div>
             </div>
@@ -218,9 +209,7 @@ export default function Contact() {
                 <Clock size={20} color="#7c3aed" />
               </div>
               <div>
-                <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 600, fontSize: 14, color: '#fff', marginBottom: 3 }}>
-                  Horario de atención
-                </div>
+                <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 600, fontSize: 14, color: '#fff', marginBottom: 3 }}>Horario de atención</div>
                 <div style={{ color: '#8a97b0', fontSize: 12 }}>Lunes a Viernes — 9am a 6pm</div>
               </div>
             </div>
@@ -239,9 +228,7 @@ export default function Contact() {
                 <Phone size={20} color="#f59e0b" />
               </div>
               <div>
-                <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 600, fontSize: 14, color: '#fff', marginBottom: 3 }}>
-                  Teléfono
-                </div>
+                <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 600, fontSize: 14, color: '#fff', marginBottom: 3 }}>Teléfono</div>
                 <div style={{ color: '#8a97b0', fontSize: 12 }}>+51 965 391 256</div>
               </div>
             </div>
@@ -255,13 +242,10 @@ export default function Contact() {
             }}>
               {guarantees.map((g, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  {g.isWhatsapp ? (
-                    <div style={{ width: 14, height: 14, borderRadius: 3, overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
-                      <Image src="/img/whatsappLogo.jpg" alt="WhatsApp" fill style={{ objectFit: 'cover' }} sizes="14px" />
-                    </div>
-                  ) : (
-                    g.icon && <g.icon size={14} color="#4f7cff" style={{ flexShrink: 0 }} />
-                  )}
+                  {g.isWhatsapp
+                    ? <WhatsAppIcon size={14} color="#4f7cff" />
+                    : g.icon && <g.icon size={14} color="#4f7cff" style={{ flexShrink: 0 }} />
+                  }
                   <span style={{ color: '#c8d0e0', fontSize: 13 }}>{g.text}</span>
                 </div>
               ))}
@@ -277,9 +261,7 @@ export default function Contact() {
               {sent ? (
                 <motion.div
                   key="success"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
+                  initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
                   style={{
                     padding: '60px 40px', borderRadius: 20, textAlign: 'center',
                     background: 'linear-gradient(135deg, rgba(6,214,160,0.08), rgba(6,214,160,0.02))',
@@ -294,18 +276,14 @@ export default function Contact() {
                   }}>
                     <CheckCircle2 size={30} color="#06d6a0" />
                   </div>
-                  <h3 style={{
-                    fontFamily: 'Syne, sans-serif', fontWeight: 800,
-                    fontSize: 24, color: '#fff', marginBottom: 12,
-                  }}>
+                  <h3 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 24, color: '#fff', marginBottom: 12 }}>
                     ¡Mensaje recibido!
                   </h3>
                   <p style={{ color: '#8a97b0', fontSize: 14, lineHeight: 1.7, maxWidth: 340, margin: '0 auto 28px' }}>
                     Gracias por escribirnos. Te respondemos en menos de 24 horas. También podés escribirnos directamente por WhatsApp para una respuesta más rápida.
                   </p>
                   <motion.a
-                    href={`https://wa.me/${WHATSAPP}`}
-                    target="_blank" rel="noopener noreferrer"
+                    href={`https://wa.me/${WHATSAPP}`} target="_blank" rel="noopener noreferrer"
                     whileHover={{ y: -2 }} whileTap={{ scale: 0.97 }}
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -320,19 +298,14 @@ export default function Contact() {
 
               ) : (
                 <motion.div
-                  key="form"
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
+                  key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                   style={{
                     padding: '36px', borderRadius: 20,
                     background: 'rgba(255,255,255,0.02)',
                     border: '1px solid rgba(255,255,255,0.07)',
                   }}
                 >
-                  <h3 style={{
-                    fontFamily: 'Syne, sans-serif', fontWeight: 700,
-                    fontSize: 18, color: '#fff', marginBottom: 6,
-                  }}>
+                  <h3 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 18, color: '#fff', marginBottom: 6 }}>
                     Contanos sobre tu proyecto
                   </h3>
                   <p style={{ color: '#8a97b0', fontSize: 13, marginBottom: 28 }}>
@@ -350,58 +323,39 @@ export default function Contact() {
                   )}
 
                   <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }} className="form-row">
                       <div>
                         <label style={labelStyle}>Tu nombre</label>
-                        <input
-                          type="text" name="name" required
-                          placeholder="Juan García"
+                        <input type="text" name="name" required placeholder="Juan García"
                           value={formData.name} onChange={handleChange}
-                          onFocus={() => setFocused('name')}
-                          onBlur={() => setFocused(null)}
-                          style={inputStyle('name')}
-                        />
+                          onFocus={() => setFocused('name')} onBlur={() => setFocused(null)}
+                          style={inputStyle('name')} />
                       </div>
                       <div>
                         <label style={labelStyle}>Tu email</label>
-                        <input
-                          type="email" name="email" required
-                          placeholder="juan@email.com"
+                        <input type="email" name="email" required placeholder="juan@email.com"
                           value={formData.email} onChange={handleChange}
-                          onFocus={() => setFocused('email')}
-                          onBlur={() => setFocused(null)}
-                          style={inputStyle('email')}
-                        />
+                          onFocus={() => setFocused('email')} onBlur={() => setFocused(null)}
+                          style={inputStyle('email')} />
                       </div>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }} className="form-row">
                       <div>
                         <label style={labelStyle}>Tu teléfono (opcional)</label>
-                        <input
-                          type="tel" name="phone"
-                          placeholder="+51 999 999 999"
+                        <input type="tel" name="phone" placeholder="+51 999 999 999"
                           value={formData.phone} onChange={handleChange}
-                          onFocus={() => setFocused('phone')}
-                          onBlur={() => setFocused(null)}
-                          style={inputStyle('phone')}
-                        />
+                          onFocus={() => setFocused('phone')} onBlur={() => setFocused(null)}
+                          style={inputStyle('phone')} />
                       </div>
                       <div>
                         <label style={labelStyle}>¿Qué necesitás?</label>
-                        <select
-                          name="service"
-                          value={formData.service} onChange={handleChange}
-                          onFocus={() => setFocused('service')}
-                          onBlur={() => setFocused(null)}
-                          style={{ ...inputStyle('service'), cursor: 'pointer' }}
-                          required
-                        >
+                        <select name="service" value={formData.service} onChange={handleChange}
+                          onFocus={() => setFocused('service')} onBlur={() => setFocused(null)}
+                          style={{ ...inputStyle('service'), cursor: 'pointer' }} required>
                           <option value="" disabled>Seleccioná un servicio</option>
                           {services.map(s => (
-                            <option key={s.value} value={s.value}
-                              style={{ background: '#111827', color: '#fff' }}>
+                            <option key={s.value} value={s.value} style={{ background: '#111827', color: '#fff' }}>
                               {s.label}
                             </option>
                           ))}
@@ -411,32 +365,26 @@ export default function Contact() {
 
                     <div>
                       <label style={labelStyle}>Contanos sobre tu proyecto</label>
-                      <textarea
-                        name="message" required rows={5}
+                      <textarea name="message" required rows={5}
                         placeholder="¿Qué querés lograr? ¿Tenés alguna idea en mente? Cuanto más nos contés, mejor podemos ayudarte."
                         value={formData.message} onChange={handleChange}
-                        onFocus={() => setFocused('message')}
-                        onBlur={() => setFocused(null)}
-                        style={{ ...inputStyle('message'), resize: 'none', lineHeight: 1.6 }}
-                      />
+                        onFocus={() => setFocused('message')} onBlur={() => setFocused(null)}
+                        style={{ ...inputStyle('message'), resize: 'none', lineHeight: 1.6 }} />
                     </div>
 
                     <div style={{ display: 'flex', gap: 12, marginTop: 4 }} className="form-buttons">
                       <motion.button
-                        type="submit"
-                        disabled={loading}
+                        type="submit" disabled={loading}
                         whileHover={{ y: loading ? 0 : -2, boxShadow: loading ? 'none' : '0 0 32px rgba(79,124,255,0.5)' }}
                         whileTap={{ scale: loading ? 1 : 0.97 }}
                         style={{
-                          flex: 1, display: 'flex', alignItems: 'center',
-                          justifyContent: 'center', gap: 8,
+                          flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                           padding: '14px', borderRadius: 12, cursor: loading ? 'default' : 'pointer',
                           background: loading ? 'rgba(79,124,255,0.5)' : 'linear-gradient(135deg, #4f7cff, #7c3aed)',
                           color: '#fff', fontSize: 14, fontWeight: 600,
                           border: '1px solid rgba(255,255,255,0.1)',
                           boxShadow: loading ? 'none' : '0 0 22px rgba(79,124,255,0.3)',
-                          fontFamily: 'DM Sans, sans-serif',
-                          opacity: loading ? 0.7 : 1,
+                          fontFamily: 'DM Sans, sans-serif', opacity: loading ? 0.7 : 1,
                         }}
                       >
                         {loading ? 'Enviando...' : 'Enviar mensaje'}
@@ -456,9 +404,7 @@ export default function Contact() {
                           whiteSpace: 'nowrap',
                         }}
                       >
-                        <div style={{ width: 18, height: 18, borderRadius: 4, overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
-                          <Image src="/img/whatsappLogo.jpg" alt="WhatsApp" fill style={{ objectFit: 'cover' }} sizes="18px" />
-                        </div>
+                        <WhatsAppIcon size={17} color="#06d6a0" />
                         WhatsApp
                       </motion.a>
                     </div>
