@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Monitor, LayoutDashboard, Zap, Headphones,
-  ArrowRight, CheckCircle2, Star, Clock,
+  Monitor, LayoutDashboard, Zap, Headphones, Smartphone,
+  ArrowRight, CheckCircle2,
   TrendingUp, Shield, Lightbulb, Target, Award
 } from 'lucide-react'
 
@@ -32,7 +32,7 @@ const services = [
     ideal: ['Negocios locales', 'Empresas', 'Emprendedores', 'Profesionales'],
     stats: [
       { icon: TrendingUp, text: '+40% más consultas' },
-      { icon: Clock, text: 'Listo en 2–3 semanas' },
+      { icon: Shield, text: 'Listo en 2–3 semanas' },
     ],
   },
   {
@@ -57,8 +57,34 @@ const services = [
     ],
     ideal: ['Tiendas y comercios', 'Clínicas y consultorios', 'Empresas de servicios', 'Negocios con equipo'],
     stats: [
-      { icon: Clock, text: 'Ahorrás horas por semana' },
+      { icon: Shield, text: 'Ahorrás horas por semana' },
       { icon: Shield, text: 'Tu info siempre segura' },
+    ],
+  },
+  {
+    icon: Smartphone,
+    title: 'Aplicación Móvil',
+    subtitle: 'Tu negocio en el bolsillo de tus clientes',
+    description: 'Una app propia le da a tu negocio una presencia permanente en el celular de tus clientes. Ideal para fidelizar, gestionar pedidos, enviar notificaciones y ofrecer una experiencia diferente a la competencia.',
+    color: '#ec4899',
+    gradient: 'linear-gradient(135deg, rgba(236,72,153,0.1), rgba(236,72,153,0.02))',
+    badge: 'Nuevo',
+    problem: '¿Tus clientes usan más el celular que la computadora?',
+    result: 'Con tu propia app vas a fidelizar clientes, recibir pedidos directos y tener un canal de comunicación que siempre está a mano.',
+    features: [
+      'Disponible para Android e iOS',
+      'Notificaciones push para llegar a tus clientes',
+      'Diseño adaptado a la identidad de tu marca',
+      'Catálogo de productos o servicios integrado',
+      'Sistema de pedidos o reservas desde la app',
+      'Panel de administración para gestionar todo',
+      'Publicación en Google Play y App Store',
+      'Soporte y actualizaciones incluidas',
+    ],
+    ideal: ['Tiendas con clientes frecuentes', 'Restaurantes y delivery', 'Negocios de servicios', 'Emprendimientos en crecimiento'],
+    stats: [
+      { icon: TrendingUp, text: '+60% retención de clientes' },
+      { icon: Shield, text: 'Android e iOS' },
     ],
   },
   {
@@ -83,7 +109,7 @@ const services = [
     ideal: ['Negocios con muchas consultas', 'Empresas con procesos repetitivos', 'Equipos que quieren ser más productivos'],
     stats: [
       { icon: TrendingUp, text: 'Hasta 70% menos trabajo manual' },
-      { icon: Clock, text: 'Funciona 24/7 solo' },
+      { icon: Shield, text: 'Funciona 24/7 solo' },
     ],
   },
   {
@@ -108,26 +134,22 @@ const services = [
     ideal: ['Negocios con sitio web activo', 'Empresas con sistema en uso', 'Quienes no tienen equipo técnico propio'],
     stats: [
       { icon: Shield, text: '99.9% tiempo activo' },
-      { icon: Clock, text: 'Respuesta en menos de 24hs' },
+      { icon: Shield, text: 'Respuesta en menos de 24hs' },
     ],
   },
 ]
 
 const whyUs = [
   { icon: Lightbulb, text: 'Te explicamos todo en palabras simples, sin tecnicismos' },
-  { icon: Zap,       text: 'Entregamos rápido y cumplimos los plazos acordados' },
-  { icon: Headphones,text: 'Estamos disponibles cuando nos necesitás' },
-  { icon: Target,    text: 'Nos enfocamos en resultados reales para tu negocio' },
-  { icon: Shield,    text: 'Soporte técnico confiable después de cada entrega' },
+  { icon: Zap,        text: 'Entregamos rápido y cumplimos los plazos acordados' },
+  { icon: Headphones, text: 'Estamos disponibles cuando nos necesitás' },
+  { icon: Target,     text: 'Nos enfocamos en resultados reales para tu negocio' },
+  { icon: Shield,     text: 'Soporte técnico confiable después de cada entrega' },
 ]
 
 export default function Services() {
   const [active, setActive] = useState(0)
   const cur = services[active]
-
-  const cell = (content: React.ReactNode, style: React.CSSProperties = {}) => (
-    <div style={style}>{content}</div>
-  )
 
   return (
     <section id="servicios" style={{ background: '#0a0d18', padding: '110px 0', overflow: 'hidden' }}>
