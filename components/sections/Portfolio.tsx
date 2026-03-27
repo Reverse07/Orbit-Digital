@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowUpRight, Globe, Monitor, Database, Users } from 'lucide-react'
+import { ArrowUpRight, Globe, Monitor, Database, Users, ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
 
 const projects = [
@@ -101,9 +101,28 @@ const projects = [
     status: 'Entregado',
     type: 'system',
   },
+  {
+    id: 6,
+    title: 'VidaSmart',
+    category: 'E-Commerce',
+    description: 'Tienda online peruana de tecnología inteligente y accesorios para mascotas. Incluye catálogo por categorías (Gaming, Smart Home, Mascotas), carrito de compras, integración con Yape y Mercado Pago, y envíos a todo el Perú.',
+    url: 'https://vida-smart.vercel.app/',
+    color: '#f97316',
+    icon: ShoppingCart,
+    image: '/img/paginaVidaSmart.png',
+    tags: ['Next.js', 'Vercel', 'E-Commerce', 'Responsive'],
+    highlights: [
+      'Catálogo filtrable por Gaming, Tech y Mascotas',
+      'Integración de pagos con Yape y Mercado Pago',
+      'Envíos a todo el Perú con tracking',
+      'Diseño optimizado para conversión y móvil',
+    ],
+    status: 'En producción',
+    type: 'web',
+  },
 ]
 
-const filters = ['Todos', 'Página Web', 'Sistema Web', 'Aplicación de Escritorio', 'Plataforma Deportiva']
+const filters = ['Todos', 'Página Web Corporativa', 'Plataforma Deportiva', 'Sistema Web', 'Aplicación de Escritorio', 'E-Commerce']
 
 export default function Portfolio() {
   const [activeFilter, setActiveFilter] = useState('Todos')
@@ -219,7 +238,6 @@ export default function Portfolio() {
                     height: 180, position: 'relative', overflow: 'hidden',
                     background: `linear-gradient(135deg, ${project.color}18, ${project.color}06)`,
                   }}>
-                    {/* Imagen real si existe */}
                     {project.image ? (
                       <>
                         <Image
@@ -229,7 +247,6 @@ export default function Portfolio() {
                           style={{ objectFit: 'cover', objectPosition: 'top', transition: 'transform 0.4s ease' }}
                           sizes="(max-width: 640px) 100vw, 340px"
                         />
-                        {/* Overlay degradado para legibilidad de badges */}
                         <div style={{
                           position: 'absolute', inset: 0,
                           background: `linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, transparent 50%, rgba(0,0,0,0.3) 100%)`,
@@ -237,7 +254,6 @@ export default function Portfolio() {
                       </>
                     ) : (
                       <>
-                        {/* Patrón decorativo (solo para proyectos sin imagen) */}
                         <div style={{
                           position: 'absolute', inset: 0,
                           backgroundImage: `radial-gradient(${project.color}20 1px, transparent 1px)`,
@@ -253,7 +269,6 @@ export default function Portfolio() {
                           width: 80, height: 80, borderRadius: '50%',
                           background: `radial-gradient(circle, ${project.color}12, transparent 70%)`,
                         }} />
-                        {/* Icono central (solo sin imagen) */}
                         <div style={{
                           position: 'absolute', top: '50%', left: '50%',
                           transform: 'translate(-50%, -50%)',
